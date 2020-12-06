@@ -57,15 +57,19 @@ void perform_float_vector_binary_op(unsigned long long size, char op,
 #ifdef __SSE__						
     switch (op) {						
     case '+':						
-      *(float4 *)res = (float4)_mm_add_ps(*(float4 *)a, *(float4 *)b);				
+      *(float4 *)res = (float4)_mm_add_ps(*(float4 *)a, *(float4 *)b);
+      break;
     case '*':						
-      *(float4 *)res = (float4)_mm_mul_ps(*(float4 *)a, *(float4 *)b);				
+      *(float4 *)res = (float4)_mm_mul_ps(*(float4 *)a, *(float4 *)b);
+      break;
     case '-':						
-      *(float4 *)res = (float4)_mm_sub_ps(*(float4 *)a, *(float4 *)b);				
+      *(float4 *)res = (float4)_mm_sub_ps(*(float4 *)a, *(float4 *)b);
+      break;
     case '/':						
       *(float4 *)res = (float4)_mm_div_ps(*(float4 *)a, *(float4 *)b);				
+      break;
     default:							
-      fprintf(stderr, "invalid operator %c", op);		
+      fprintf(stderr, "invalid operator %c for size %llu\n", op, size);		
       exit(EXIT_FAILURE);					
       break;							
     };							
@@ -77,15 +81,19 @@ void perform_float_vector_binary_op(unsigned long long size, char op,
 #ifdef __AVX__						
     switch (op) {						
     case '+':						
-      *(float8 *)res = (float8)_mm256_add_ps(*(float8 *)a, *(float8 *)b);				
+      *(float8 *)res = (float8)_mm256_add_ps(*(float8 *)a, *(float8 *)b);
+      break;
     case '*':						
       *(float8 *)res = (float8)_mm256_mul_ps(*(float8 *)a, *(float8 *)b);				
+      break;
     case '-':						
       *(float8 *)res = (float8)_mm256_sub_ps(*(float8 *)a, *(float8 *)b);				
+      break;
     case '/':						
       *(float8 *)res = (float8)_mm256_div_ps(*(float8 *)a, *(float8 *)b);				
+      break;
     default:							
-      fprintf(stderr, "invalid operator %c", op);		
+      fprintf(stderr, "invalid operator %c for size %llu\n", op, size);
       exit(EXIT_FAILURE);					
       break;							
     };							
@@ -98,14 +106,18 @@ void perform_float_vector_binary_op(unsigned long long size, char op,
     switch (op) {						
     case '+':						
       *(float16 *)res = (float16)_mm512_add_ps(*(float16 *)a, *(float16 *)b);				
+      break;
     case '*':						
       *(float16 *)res = (float16)_mm512_mul_ps(*(float16 *)a, *(float16 *)b);				
+      break;
     case '-':						
       *(float16 *)res = (float16)_mm512_sub_ps(*(float16 *)a, *(float16 *)b);				
+      break;
     case '/':						
       *(float16 *)res = (float16)_mm512_div_ps(*(float16 *)a, *(float16 *)b);				
+      break;
     default:							
-      fprintf(stderr, "invalid operator %c", op);		
+      fprintf(stderr, "invalid operator %c for size %llu\n", op, size);		
       exit(EXIT_FAILURE);					
       break;							
     };							
@@ -114,7 +126,7 @@ void perform_float_vector_binary_op(unsigned long long size, char op,
     break;							
 #endif							
   default:							
-    fprintf(stderr, "invalid size %llu", size);			
+    fprintf(stderr, "invalid size %llu\n", size);			
     exit(EXIT_FAILURE);						
     break;							
   };
@@ -133,6 +145,8 @@ int main(int argc, char **argv) {
   unsigned long long size = strtoll(argv[3], NULL, 10);
 
   if (strcmp(precision, "float") == 0) {
+    printf("%s %c %lld\n", precision, op, size);
+    
     float a[size];
     float b[size];
     float res[size];

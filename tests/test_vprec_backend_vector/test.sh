@@ -17,10 +17,13 @@ touch output_vprec.txt
 export VFC_BACKENDS="libinterflop_vprec.so"
 for i in 2 4 8 16
 do
-    ./$bin float "+" $i $vec >> output_vprec.txt
-    ./$bin float "*" $i $vec >> output_vprec.txt
-    ./$bin float "-" $i $vec >> output_vprec.txt
-    ./$bin float "/" $i $vec >> output_vprec.txt
+    for type in float double
+    do
+    ./$bin $type "+" $i $vec >> output_vprec.txt
+    ./$bin $type "*" $i $vec >> output_vprec.txt
+    ./$bin $type "-" $i $vec >> output_vprec.txt
+    ./$bin $type "/" $i $vec >> output_vprec.txt
+    done
 done
 
 # Test if file is equal

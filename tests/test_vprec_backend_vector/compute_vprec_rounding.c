@@ -14,9 +14,40 @@ typedef float float4 __attribute__((ext_vector_type(4)));
 typedef float float8 __attribute__((ext_vector_type(8)));
 typedef float float16 __attribute__((ext_vector_type(16)));
 
-/* perform vector operation in scalar mode */
+/* perform float vector operation in scalar mode */
 void perform_float_scalar_vector_binary_op(unsigned long long size, char op,
 					   float *res, float *a, float *b) {
+  switch (op) {							
+  case '+':						
+    for (int i = 0; i < size; ++i) {				
+      res[i] = a[i] + b[i];					
+    }								
+    break;							
+  case '*':						
+    for (int i = 0; i < size; ++i) {				
+      res[i] = a[i] * b[i];					
+    }								
+    break;							
+  case '-':						
+    for (int i = 0; i < size; ++i) {				
+      res[i] = a[i] - b[i];					
+    }								
+    break;							
+  case '/':						
+    for (int i = 0; i < size; ++i) {				
+      res[i] = a[i] / b[i];					
+    }								
+    break;							
+  default:							
+    fprintf(stderr, "invalid operator %c", op);			
+    exit(EXIT_FAILURE);						
+    break;							
+  };
+}
+
+/* perform double vector operation in scalar mode */
+void perform_double_scalar_vector_binary_op(unsigned long long size, char op,
+					    double *res, double *a, double *b) {
   switch (op) {							
   case '+':						
     for (int i = 0; i < size; ++i) {				
@@ -132,6 +163,93 @@ void perform_float_vector_binary_op(unsigned long long size, char op,
   };
 }
 
+/* perform_double_vector_bin_op: applies the binary operator (op) to vectors (a) and (b) */
+/* and stores the result in vector (res) */
+void perform_double_vector_binary_op(unsigned long long size, char op,
+				    void *res, void *a, void *b) {
+  switch (size) {						
+  case 2:							
+#ifdef __SSE__						
+    switch (op) {						
+    case '+':						
+      *(double2 *)res = (double2)_mm_add_ps(*(double2 *)a, *(double2 *)b);
+      break;
+    case '*':						
+      *(double2 *)res = (double2)_mm_mul_ps(*(double2 *)a, *(double2 *)b);
+      break;
+    case '-':						
+      *(double2 *)res = (double2)_mm_sub_ps(*(double2 *)a, *(double2 *)b);
+      break;
+    case '/':						
+      *(double2 *)res = (double2)_mm_div_ps(*(double2 *)a, *(double2 *)b);				
+      break;
+    default:							
+      fprintf(stderr, "invalid operator %c for size %llu\n", op, size);		
+      exit(EXIT_FAILURE);					
+      break;							
+    };							
+#else							
+    perform_double_scalar_vector_binary_op(size, op, res, a, b);	
+    break;							
+#endif							
+  case 4:							
+#ifdef __AVX__						
+    switch (op) {						
+    case '+':						
+      *(double4 *)res = (double4)_mm256_add_ps(*(double4 *)a, *(double4 *)b);
+      break;
+    case '*':						
+      *(double4 *)res = (double4)_mm256_mul_ps(*(double4 *)a, *(double4 *)b);
+      break;
+    case '-':						
+      *(double4 *)res = (double4)_mm256_sub_ps(*(double4 *)a, *(double4 *)b);
+      break;
+    case '/':						
+      *(double4 *)res = (double4)_mm256_div_ps(*(double4 *)a, *(double4 *)b);				
+      break;
+    default:							
+      fprintf(stderr, "invalid operator %c for size %llu\n", op, size);		
+      exit(EXIT_FAILURE);					
+      break;							
+    };							
+#else							
+    perform_double_scalar_vector_binary_op(size, op, res, a, b);	
+    break;							
+#endif							
+  case 8:							
+#ifdef __AVX512__						
+    switch (op) {						
+    case '+':						
+      *(double8 *)res = (double8)_mm512_add_ps(*(double8 *)a, *(double8 *)b);
+      break;
+    case '*':						
+      *(double8 *)res = (double8)_mm512_mul_ps(*(double8 *)a, *(double8 *)b);				
+      break;
+    case '-':						
+      *(double8 *)res = (double8)_mm512_sub_ps(*(double8 *)a, *(double8 *)b);				
+      break;
+    case '/':						
+      *(double8 *)res = (double8)_mm512_div_ps(*(double8 *)a, *(double8 *)b);				
+      break;
+    default:							
+      fprintf(stderr, "invalid operator %c for size %llu\n", op, size);
+      exit(EXIT_FAILURE);					
+      break;							
+    };							
+#else							
+    perform_double_scalar_vector_binary_op(size, op, res, a, b);	
+    break;							
+#endif							
+  case 16:							
+    perform_double_scalar_vector_binary_op(size, op, res, a, b);	
+    break;							
+  default:							
+    fprintf(stderr, "invalid size %llu\n", size);			
+    exit(EXIT_FAILURE);						
+    break;							
+  };
+}
+
 int main(int argc, char **argv) {
 
   if (argc < 3) {
@@ -165,8 +283,25 @@ int main(int argc, char **argv) {
     }
   }
   else if (strcmp(precision, "double") == 0) {
-    fprintf(stderr, "Not yet supported\n");
-    exit(EXIT_FAILURE);
+    printf("%s %c %lld\n", precision, op, size);
+    
+    double16 a;
+    double16 b;
+    double16 res;
+    
+    for (unsigned long long i = 0; i < size; ++i) {
+      a[i] = strtod(argv[4 + i], NULL);
+    }
+
+    for (unsigned long long i = 0; i < size; ++i) {
+      b[i] = strtod(argv[4 + size + i], NULL);
+    }
+
+    perform_double_vector_binary_op(size, op, &res, &a, &b);
+    
+    for (unsigned long long i = 0; i < size; ++i) {
+      printf("%lf\n", res[i]);
+    }
   }
   else {
     fprintf(stderr, "Bad type : float | double\n");

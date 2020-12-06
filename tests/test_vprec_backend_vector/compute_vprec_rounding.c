@@ -16,7 +16,7 @@ typedef float float16 __attribute__((ext_vector_type(16)));
 
 /* perform vector operation in scalar mode */
 void perform_float_scalar_vector_binary_op(unsigned long long size, char op,
-				     float *res, float *a, float *b) {
+					   float *res, float *a, float *b) {
   switch (op) {							
   case '+':						
     for (int i = 0; i < size; ++i) {				
@@ -132,7 +132,6 @@ void perform_float_vector_binary_op(unsigned long long size, char op,
   };
 }
 
-
 int main(int argc, char **argv) {
 
   if (argc < 3) {
@@ -147,9 +146,9 @@ int main(int argc, char **argv) {
   if (strcmp(precision, "float") == 0) {
     printf("%s %c %lld\n", precision, op, size);
     
-    float a[size];
-    float b[size];
-    float res[size];
+    float16 a;
+    float16 b;
+    float16 res;
     
     for (unsigned long long i = 0; i < size; ++i) {
       a[i] = strtof(argv[4 + i], NULL);
@@ -160,6 +159,7 @@ int main(int argc, char **argv) {
     }
 
     perform_float_vector_binary_op(size, op, &res, &a, &b);
+    
     for (unsigned long long i = 0; i < size; ++i) {
       printf("%f\n", res[i]);
     }

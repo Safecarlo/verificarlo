@@ -4,7 +4,7 @@
 bin=binary_compute_vprec_rounding
 
 # Compile test
-verificarlo-c compute_vprec_rounding.c -o $bin
+verificarlo-c -march=native compute_vprec_rounding.c -o $bin
 
 # Delete past result
 rm -Rf output_vprec.txt

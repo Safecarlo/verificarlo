@@ -7,26 +7,30 @@ bin=binary_compute_vprec_rounding
 verificarlo-c compute_vprec_rounding.c -o $bin
 
 # Delete past result
-rm -Rf output*
+rm -Rf output_vprec.txt
+
+# Vector variable
+vec="1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1"
 
 # Run test
-export VFC_BACKENDS="libinterflop_ieee.so"
-./$bin float + 2 0.01 0.7 5565.0 666.000099 > output_iee.txt
+touch output_vprec.txt
 export VFC_BACKENDS="libinterflop_vprec.so"
-./$bin float + 2 0.01 0.7 5565.0 666.000099 > output_vprec.txt
+for i in 2 4 8 16
+do
+    ./$bin float "+" $i $vec >> output_vprec.txt
+    ./$bin float "*" $i $vec >> output_vprec.txt
+    ./$bin float "-" $i $vec >> output_vprec.txt
+    ./$bin float "/" $i $vec >> output_vprec.txt
+done
 
 # Test if file is equal
-is_equal_iee=$(diff -U 0 result.txt output_iee.txt | grep ^@ | wc -l)
-is_equal_vprec=$(diff -U 0 result.txt output_vprec.txt | grep ^@ | wc -l)
-
-# Group result
-test_pass=$(((! $is_equal_iee) && $is_equal_vprec))
+is_equal=$(diff -U 0 result.txt output_vprec.txt | grep ^@ | wc -l)
 
 # Print result
-echo $test_pass
+echo $is_equal
 
 # Exit
-if [ $test_pass == 0 ] ; then
+if [ $is_equal == 0 ] ; then
     exit 0;
 else
     exit 1;

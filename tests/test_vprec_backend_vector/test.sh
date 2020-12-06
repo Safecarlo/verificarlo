@@ -29,6 +29,9 @@ is_equal=$(diff -U 0 result.txt output_vprec.txt | grep ^@ | wc -l)
 # Print result
 echo $is_equal
 
+# Clean folder
+rm -Rf *~ *.o $bin
+
 # Exit
 if [ $is_equal == 0 ] ; then
     exit 0;

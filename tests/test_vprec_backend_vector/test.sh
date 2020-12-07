@@ -50,31 +50,41 @@ compile_and_run()
 }
 
 # Test if file is equal
-is_equal=1
+is_equal_none=1
+is_equal_sse=1
+is_equal_avx=1
+is_equal_avx512=1
+
 if [ $is_none == 1 ] ; then
     compile_and_run "" output_none.txt
-    is_equal=$(diff -U 0 result_none.txt output_none.txt | grep ^@ | wc -l)
+    is_equal_none=$(diff -U 0 result_none.txt output_none.txt | grep ^@ | wc -l)
 elif [ true ] ; then
     # SSE
     if [ $is_sse == 1 ]; then
 	compile_and_run -msse output_sse.txt
-	is_equal=$(diff -U 0 result_sse.txt output_sse.txt | grep ^@ | wc -l)
+	is_equal_sse=$(diff -U 0 result_sse.txt output_sse.txt | grep ^@ | wc -l)
     fi
 
     # AVX
     if [ $is_avx == 1 ] ; then
 	compile_and_run -mavx output_avx.txt
-	is_equal=$(diff -U 0 result_avx.txt output_avx.txt | grep ^@ | wc -l)
+	is_equal_avx=$(diff -U 0 result_avx.txt output_avx.txt | grep ^@ | wc -l)
     fi
 
     # AVX512F
     if [ $is_avx512 == 1 ] ; then
 	compile_and_run -mavx512f output_avx512.txt
-	is_equal=$(diff -U 0 result_avx512.txt output_avx512.txt | grep ^@ | wc -l)
+	is_equal_avx512=$(diff -U 0 result_avx512.txt output_avx512.txt | grep ^@ | wc -l)
     fi
 fi
 
 # Print result
+if [ $is_equal_none == 0 ] && [ $is_equal_sse == 0 ] && [ $is_equal_avx == 0 ] && [ $is_equal_avx512 == 0 ] ; then
+    is_equal=0
+else
+    is_equal=1
+fi
+
 echo $is_equal
 
 # Clean folder

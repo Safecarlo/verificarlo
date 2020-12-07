@@ -1,0 +1,64 @@
+float + 2
+invalid vector of size 2 for type float
+float * 2
+invalid vector of size 2 for type float
+float - 2
+invalid vector of size 2 for type float
+float / 2
+invalid vector of size 2 for type float
+double + 2
+sse instruction not available
+double * 2
+sse instruction not available
+double - 2
+sse instruction not available
+double / 2
+sse instruction not available
+float + 4
+sse instruction not available
+float * 4
+sse instruction not available
+float - 4
+sse instruction not available
+float / 4
+sse instruction not available
+double + 4
+avx instruction not available
+double * 4
+avx instruction not available
+double - 4
+avx instruction not available
+double / 4
+avx instruction not available
+float + 8
+avx instruction not available
+float * 8
+avx instruction not available
+float - 8
+avx instruction not available
+float / 8
+avx instruction not available
+double + 8
+avx512 instruction not available
+double * 8
+avx512 instruction not available
+double - 8
+avx512 instruction not available
+double / 8
+avx512 instruction not available
+float + 16
+avx512 instruction not available
+float * 16
+avx512 instruction not available
+float - 16
+avx512 instruction not available
+float / 16
+avx512 instruction not available
+double + 16
+invalid vector of size 16 for type double
+double * 16
+invalid vector of size 16 for type double
+double - 16
+invalid vector of size 16 for type double
+double / 16
+invalid vector of size 16 for type double

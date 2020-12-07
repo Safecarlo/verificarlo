@@ -3,33 +3,88 @@
 
 bin=binary_compute_vprec_rounding
 
-# Compile test
-verificarlo-c -march=native compute_vprec_rounding.c -o $bin
-
 # Delete past result
-rm -Rf output_vprec.txt
+rm -Rf output*.txt
 
-# Vector variable
+# Variable
+cpuinfo=$(cat /proc/cpuinfo)
+
+is_sse=$(echo $cpuinfo | grep sse | wc -l)
+is_avx=$(echo $cpuinfo | grep avx | wc -l)
+is_avx512=$(echo $cpuinfo | grep avx512 | wc -l)
+
+if [ $is_sse == 1 ] || [ $is_avx == 1 ] || [ $is_avx512 == 1 ] ; then
+    is_none=0
+else
+    is_none=1
+fi
+
 vec="1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1"
 
-# Run test
-touch output_vprec.txt
-export VFC_BACKENDS="libinterflop_vprec.so"
-for i in 2 4 8 16
-do
-    for type in float double
+# Compile and run the program
+# Take the architecture flags on parameter and the output file
+compile_and_run()
+{
+    export VFC_BACKENDS_SILENT_LOAD="True"
+    export VFC_BACKENDS_LOGGER="False"
+    
+    # Compile test
+    verificarlo-c $1 compute_vprec_rounding.c -o $bin
+
+    # Run test
+    touch output_vprec.txt
+    export VFC_BACKENDS="libinterflop_vprec.so"
+    for i in 2 4 8 16
     do
-    ./$bin $type "+" $i $vec >> output_vprec.txt
-    ./$bin $type "*" $i $vec >> output_vprec.txt
-    ./$bin $type "-" $i $vec >> output_vprec.txt
-    ./$bin $type "/" $i $vec >> output_vprec.txt
+	for type in float double
+	do
+	    ./$bin $type "+" $i $vec >> $2
+	    ./$bin $type "*" $i $vec >> $2
+	    ./$bin $type "-" $i $vec >> $2
+	    ./$bin $type "/" $i $vec >> $2
+	done
     done
-done
+
+    unset VFC_BACKENDS_SILENT_LOAD
+    export VFC_BACKENDS_LOGGER="True"
+}
 
 # Test if file is equal
-is_equal=$(diff -U 0 result.txt output_vprec.txt | grep ^@ | wc -l)
+is_equal_none=1
+is_equal_sse=1
+is_equal_avx=1
+is_equal_avx512=1
+
+if [ $is_none == 1 ] ; then
+    compile_and_run "" output_none.txt
+    is_equal_none=$(diff -U 0 result_none.txt output_none.txt | grep ^@ | wc -l)
+elif [ true ] ; then
+    # SSE
+    if [ $is_sse == 1 ]; then
+	compile_and_run -msse output_sse.txt
+	is_equal_sse=$(diff -U 0 result_sse.txt output_sse.txt | grep ^@ | wc -l)
+    fi
+
+    # AVX
+    if [ $is_avx == 1 ] ; then
+	compile_and_run -mavx output_avx.txt
+	is_equal_avx=$(diff -U 0 result_avx.txt output_avx.txt | grep ^@ | wc -l)
+    fi
+
+    # AVX512F
+    if [ $is_avx512 == 1 ] ; then
+	compile_and_run -mavx512f output_avx512.txt
+	is_equal_avx512=$(diff -U 0 result_avx512.txt output_avx512.txt | grep ^@ | wc -l)
+    fi
+fi
 
 # Print result
+if [ $is_equal_none == 0 ] && [ $is_equal_sse == 0 ] && [ $is_equal_avx == 0 ] && [ $is_equal_avx512 == 0 ] ; then
+    is_equal=0
+else
+    is_equal=1
+fi
+
 echo $is_equal
 
 # Clean folder

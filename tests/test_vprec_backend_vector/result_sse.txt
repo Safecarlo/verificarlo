@@ -1,0 +1,56 @@
+float + 2
+float * 2
+float - 2
+float / 2
+double + 2
+2.200000
+2.200000
+double * 2
+1.210000
+1.210000
+double - 2
+0.000000
+0.000000
+double / 2
+1.000000
+1.000000
+float + 4
+2.200000
+2.200000
+2.200000
+2.200000
+float * 4
+1.210000
+1.210000
+1.210000
+1.210000
+float - 4
+0.000000
+0.000000
+0.000000
+0.000000
+float / 4
+1.000000
+1.000000
+1.000000
+1.000000
+double + 4
+double * 4
+double - 4
+double / 4
+float + 8
+float * 8
+float - 8
+float / 8
+double + 8
+double * 8
+double - 8
+double / 8
+float + 16
+float * 16
+float - 16
+float / 16
+double + 16
+double * 16
+double - 16
+double / 16

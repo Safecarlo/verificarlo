@@ -25,6 +25,9 @@ vec="1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1 1.1
 # Take the architecture flags on parameter and the output file
 compile_and_run()
 {
+    export VFC_BACKENDS_SILENT_LOAD="True"
+    export VFC_BACKENDS_LOGGER="False"
+    
     # Compile test
     verificarlo-c $1 compute_vprec_rounding.c -o $bin
 
@@ -41,6 +44,9 @@ compile_and_run()
 	    ./$bin $type "/" $i $vec >> $2
 	done
     done
+
+    unset VFC_BACKENDS_SILENT_LOAD
+    export VFC_BACKENDS_LOGGER="True"
 }
 
 # Test if file is equal

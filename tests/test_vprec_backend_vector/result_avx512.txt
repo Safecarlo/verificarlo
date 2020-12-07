@@ -1,11 +1,7 @@
 float + 2
-invalid vector of size 2 for type float
 float * 2
-invalid vector of size 2 for type float
 float - 2
-invalid vector of size 2 for type float
 float / 2
-invalid vector of size 2 for type float
 double + 2
 2.200000
 2.200000
@@ -199,10 +195,6 @@ float / 16
 1.000000
 1.000000
 double + 16
-invalid vector of size 16 for type double
 double * 16
-invalid vector of size 16 for type double
 double - 16
-invalid vector of size 16 for type double
 double / 16
-invalid vector of size 16 for type double
